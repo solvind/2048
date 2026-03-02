@@ -122,16 +122,16 @@ function renderSequence() {
   const items = getDisplayItems();
   elLines.forEach((el, i) => {
     if (i === 0) {
-      // Gjeldende tall: vis hva som er tastet
+      // Gjeldende tall: vis hva som er tastet, skjul resten med understrek
       const target = items[0];
       const typed = inputBuf;
-      const rest = target.slice(typed.length);
+      const hiddenCount = target.length - typed.length;
+      const placeholder = '_'.repeat(hiddenCount);
       el.innerHTML =
         `<span style="color:#6a7cff">${typed}</span>` +
-        `<span style="color:#f4f5f9">${rest}</span>` +
-        (items[1] ? `<span style="color:#555b75">  →  ${items[1]}</span>` : '');
+        `<span style="color:#555b75">${placeholder}</span>`;
     } else {
-      el.textContent = items[i] ? `       ${items[i]}` : '';
+      el.textContent = items[i] ? '?' .repeat(items[i].length) : '';
       el.style.color = '#555b75';
     }
   });
