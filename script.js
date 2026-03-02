@@ -9,6 +9,7 @@ const MODES = {
     rules: 'Trykk på riktig neste siffer. Feil gir game over.',
     sequence: () => PI_DIGITS.split('').map(Number),
     separator: '',
+    prefix: '3.',
   },
   prime: {
     title: 'Prime – Primtall',
@@ -117,15 +118,23 @@ function startGame() {
 // ─── Sekvensvisning ───────────────────────────────────────────────────────────
 
 function renderSequence() {
-  const sep = MODES[mode].separator;
+  const modeData = MODES[mode];
+  const sep = modeData.separator;
+  const prefix = modeData.prefix || '';
   const answered = seq.slice(0, seqPos);
   const current = inputBuf || '_';
 
   let historyStr = answered.length === 0 ? '' : answered.join(sep) + sep;
-  const fullStr = historyStr + current;
+  const fullStr = prefix + historyStr + current;
 
   const maxLen = 30;
   const display = fullStr.length > maxLen ? '…' + fullStr.slice(fullStr.length - maxLen) : fullStr;
+
+  // The answered part includes the prefix at the start (only when not truncated)
+  const answeredWithPrefix = prefix + historyStr;
+  const answeredDisplay = answeredWithPrefix.length > maxLen
+    ? '…' + answeredWithPrefix.slice(answeredWithPrefix.length - maxLen)
+    : answeredWithPrefix;
   const inputStart = display.length - current.length;
 
   elLines[0].innerHTML =
