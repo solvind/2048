@@ -261,9 +261,23 @@ function handleKeyPress(value) {
     return;
   }
 
+  if (value === "Backspace") {
+    typedValue = typedValue.slice(0, -1);
+    updateDisplay();
+    return;
+  }
+
   if (/^\d$/.test(value)) {
     typedValue += value;
     updateDisplay();
+  }
+}
+
+function handleKeyboardInput(event) {
+  const allowedKeys = ["Enter", "Backspace"];
+  if (/^\d$/.test(event.key) || allowedKeys.includes(event.key)) {
+    event.preventDefault();
+    handleKeyPress(event.key);
   }
 }
 
@@ -333,6 +347,7 @@ function init() {
 }
 
 restartBtn.addEventListener("click", init);
+document.addEventListener("keydown", handleKeyboardInput);
 if (rulesToggleBtn && rulesPanel) {
   rulesToggleBtn.addEventListener("click", () => {
     const expanded = rulesToggleBtn.getAttribute("aria-expanded") === "true";
