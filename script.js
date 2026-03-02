@@ -85,8 +85,7 @@ function buildKeypad() {
     btn.className = 'key' + (label === '↵' ? ' enter-key' : '');
     btn.textContent = label;
     btn.setAttribute('type', 'button');
-    btn.addEventListener('pointerdown', e => {
-      e.preventDefault();
+    btn.addEventListener('click', () => {
       handleKey(label);
     });
     elKeypad.appendChild(btn);
