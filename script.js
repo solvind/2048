@@ -65,17 +65,13 @@ let gameOver = false;
 const elScore      = document.getElementById('score');
 const elHighscore  = document.getElementById('highscore');
 const elTimer      = document.getElementById('timer');
-const elTimerToggle= document.getElementById('timer-toggle');
 const elStatus     = document.getElementById('status');
 const elKeypad     = document.getElementById('keypad');
-const elEntryWrap  = document.getElementById('entry-wrapper');
-const elInput      = document.getElementById('entry-input');
 const elRulesToggle= document.getElementById('rules-toggle');
 const elRulesPanel = document.getElementById('rules-panel');
 const elGameTitle  = document.getElementById('game-title');
 const elGameDesc   = document.getElementById('game-description');
 const elGameRules  = document.getElementById('game-rules');
-const elRestart    = document.getElementById('restart');
 const elLines      = [
   document.getElementById('sequence-line-1'),
   document.getElementById('sequence-line-2'),
@@ -107,8 +103,6 @@ function startGame() {
   elStatus.textContent = '';
   elStatus.style.color = '';
   elKeypad.classList.remove('disabled');
-  elEntryWrap.hidden = false;
-  elInput.value = '';
   stopTimer();
   if (timerOn) startTimer();
   renderSequence();
@@ -149,16 +143,36 @@ function renderSequence() {
 
 function buildKeypad() {
   elKeypad.innerHTML = '';
-  const keys = ['1','2','3','4','5','6','7','8','9','⌫','0','↵'];
+  const keys = ['1','2','3','4','5','6','7','8','9','timer-toggle','0','restart'];
   keys.forEach(label => {
     const btn = document.createElement('button');
-    btn.className = 'key' + (label === '↵' ? ' enter-key' : '');
-    btn.textContent = label;
     btn.setAttribute('type', 'button');
-    btn.addEventListener('pointerdown', e => {
-      e.preventDefault();
-      handleKey(label);
-    });
+    if (label === 'timer-toggle') {
+      btn.id = 'timer-toggle';
+      btn.className = 'key timer-key' + (timerOn ? ' active' : '');
+      btn.innerHTML = '<span class="timer-icon">⏱</span>';
+      btn.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        timerOn = !timerOn;
+        btn.classList.toggle('active', timerOn);
+        if (timerOn) startTimer(); else { stopTimer(); elTimer.textContent = '–'; }
+      });
+    } else if (label === 'restart') {
+      btn.id = 'restart';
+      btn.className = 'key restart-key';
+      btn.textContent = '🔄';
+      btn.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        startGame();
+      });
+    } else {
+      btn.className = 'key';
+      btn.textContent = label;
+      btn.addEventListener('pointerdown', e => {
+        e.preventDefault();
+        handleKey(label);
+      });
+    }
     elKeypad.appendChild(btn);
   });
 }
@@ -167,21 +181,10 @@ function buildKeypad() {
 
 function handleKey(label) {
   if (gameOver) return;
-  if (label === '⌫') {
-    inputBuf = inputBuf.slice(0, -1);
-    elInput.value = inputBuf;
-    renderSequence();
-    return;
-  }
-  if (label === '↵') {
-    submitAnswer();
-    return;
-  }
   const digit = label;
   const target = seq[seqPos];
 
   inputBuf += digit;
-  elInput.value = inputBuf;
 
   if (!target.startsWith(inputBuf)) {
     triggerWrong();
@@ -213,7 +216,6 @@ function submitAnswer() {
     saveHighscores();
   }
   inputBuf = '';
-  elInput.value = '';
   elStatus.textContent = '';
   resetTimer();
   renderSequence();
@@ -225,7 +227,6 @@ function triggerWrong() {
   elKeypad.classList.add('disabled');
   elStatus.textContent = '✗ Feil! Riktig var: ' + seq[seqPos];
   elStatus.style.color = '#ff6b6b';
-  elInput.value = inputBuf;
 }
 
 // ─── Timer ────────────────────────────────────────────────────────────────────
@@ -283,16 +284,6 @@ document.querySelectorAll('.mode-tab').forEach(btn => {
     updateRulesPanel();
     startGame();
   });
-});
-
-elRestart.addEventListener('click', startGame);
-
-elTimerToggle.addEventListener('click', () => {
-  timerOn = !timerOn;
-  elTimerToggle.textContent = timerOn ? 'På' : 'Av';
-  elTimerToggle.setAttribute('aria-pressed', timerOn);
-  elTimerToggle.classList.toggle('active', timerOn);
-  if (timerOn) startTimer(); else { stopTimer(); elTimer.textContent = '–'; }
 });
 
 elRulesToggle.addEventListener('click', () => {

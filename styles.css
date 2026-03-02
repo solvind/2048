@@ -43,8 +43,7 @@ body {
 }
 
 .mode-tab,
-.rules-btn,
-.restart-btn {
+.rules-btn {
   border: none;
   border-radius: 999px;
   padding: 0.55rem 0.6rem;
@@ -63,11 +62,6 @@ body {
   aspect-ratio: 1;
   border-radius: 50%;
   padding: 0;
-}
-
-.restart-btn {
-  border-radius: 10px;
-  background: #6a7cff;
 }
 
 .rules-panel {
@@ -115,20 +109,6 @@ body {
   letter-spacing: 0.04em;
 }
 
-.timer-toggle {
-  border: none;
-  border-radius: 999px;
-  background: #3a3f52;
-  color: #ffffff;
-  font-weight: 700;
-  padding: 0.3rem 0.75rem;
-  cursor: pointer;
-}
-
-.timer-toggle.active {
-  background: #6a7cff;
-}
-
 .sequence-panel {
   margin-top: 0.7rem;
 }
@@ -159,27 +139,6 @@ body {
   color: #f4f5f9;
 }
 
-.entry {
-  margin-bottom: 0.7rem;
-}
-
-.entry label {
-  display: block;
-  margin-bottom: 0.35rem;
-  color: #9ea3ba;
-  font-size: 0.9rem;
-}
-
-.entry input {
-  width: 100%;
-  border-radius: 10px;
-  border: 1px solid #49506b;
-  background: #0a0c11;
-  color: #f4f5f9;
-  font-size: 1.1rem;
-  padding: 0.6rem;
-}
-
 .keypad {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -198,6 +157,28 @@ body {
 
 .enter-key {
   font-size: 1rem;
+}
+
+.timer-key {
+  background: #3a3f52;
+  font-size: 1.3rem;
+}
+
+.timer-key.active {
+  background: #6a7cff;
+}
+
+.timer-key .timer-icon {
+  text-decoration: line-through;
+}
+
+.timer-key.active .timer-icon {
+  text-decoration: none;
+}
+
+.restart-key {
+  background: #6a7cff;
+  font-size: 1.3rem;
 }
 
 .keypad.disabled {

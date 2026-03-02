@@ -19,7 +19,6 @@
           <button class="mode-tab" data-mode="pyramid" role="tab" aria-selected="false">Pyramid</button>
           <button id="rules-toggle" class="rules-btn" type="button" aria-expanded="false" aria-controls="rules-panel">?</button>
         </div>
-        <button id="restart" class="restart-btn" type="button">Start på nytt</button>
       </header>
 
       <section id="rules-panel" class="rules-panel" hidden>
@@ -41,11 +40,6 @@
           <span>Tid igjen</span>
           <strong id="timer">3.0s</strong>
         </div>
-        <div class="display-row">
-          <span>Tidtaker</span>
-          <button id="timer-toggle" class="timer-toggle" type="button" aria-pressed="false">Av</button>
-        </div>
-
         <div class="sequence-panel" aria-label="Sekvens">
           <span class="sequence-label">Sekvens</span>
           <div class="sequence-window" id="sequence-window">
@@ -55,11 +49,6 @@
           </div>
         </div>
       </section>
-
-      <div class="entry" id="entry-wrapper">
-        <label for="entry-input">Svar</label>
-        <input id="entry-input" type="text" inputmode="numeric" autocomplete="off" readonly />
-      </div>
 
       <div class="keypad" id="keypad"></div>
 
