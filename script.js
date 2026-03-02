@@ -8,6 +8,7 @@ const MODES = {
     description: 'Lær sifrene i pi (3.14159…) i rekkefølge.',
     rules: 'Trykk på riktig neste siffer. Feil gir game over.',
     sequence: () => PI_DIGITS.split('').map(Number),
+    separator: '',
   },
   prime: {
     title: 'Prime – Primtall',
@@ -22,6 +23,7 @@ const MODES = {
       }
       return primes;
     },
+    separator: ' - ',
   },
   fibonacci: {
     title: 'Fibonacci',
@@ -32,23 +34,25 @@ const MODES = {
       while (fibs.length < 80) fibs.push(fibs[fibs.length - 1] + fibs[fibs.length - 2]);
       return fibs;
     },
+    separator: ' - ',
   },
   pyramid: {
     title: 'Pyramid – Kvadrattall',
     description: 'Tast inn kvadrattall: 1, 4, 9, 16, 25 …',
     rules: 'Feil tast gir game over.',
     sequence: () => Array.from({ length: 100 }, (_, i) => (i + 1) ** 2),
+    separator: ' - ',
   },
 };
 
 // ─── Tilstand ─────────────────────────────────────────────────────────────────
 
 let mode = 'pi';
-let seq = [];           // full sekvens av tall/sifre som strenger
-let seqPos = 0;         // neste posisjon i seq
-let inputBuf = '';      // hva brukeren har tastet så langt for gjeldende tall
+let seq = [];
+let seqPos = 0;
+let inputBuf = '';
 let score = 1;
-let highscores = {};    // { pi: 1, prime: 1, ... }
+let highscores = {};
 let timerOn = false;
 let timerInterval = null;
 let timeLeft = 3.0;
@@ -112,29 +116,24 @@ function startGame() {
 
 // ─── Sekvensvisning ───────────────────────────────────────────────────────────
 
-function getDisplayItems() {
-  // Vis gjeldende og neste to tall
-  return [seqPos, seqPos + 1, seqPos + 2]
-    .map(i => (i < seq.length ? seq[i] : ''));
-}
-
 function renderSequence() {
-  const items = getDisplayItems();
-  elLines.forEach((el, i) => {
-    if (i === 0) {
-      // Gjeldende tall: vis hva som er tastet, skjul resten med understrek
-      const target = items[0];
-      const typed = inputBuf;
-      const hiddenCount = target.length - typed.length;
-      const placeholder = '_'.repeat(hiddenCount);
-      el.innerHTML =
-        `<span style="color:#6a7cff">${typed}</span>` +
-        `<span style="color:#555b75">${placeholder}</span>`;
-    } else {
-      el.textContent = items[i] ? '?' .repeat(items[i].length) : '';
-      el.style.color = '#555b75';
-    }
-  });
+  const sep = MODES[mode].separator;
+  const answered = seq.slice(0, seqPos);
+  const current = inputBuf || '_';
+
+  let historyStr = answered.length === 0 ? '' : answered.join(sep) + sep;
+  const fullStr = historyStr + current;
+
+  const maxLen = 30;
+  const display = fullStr.length > maxLen ? '…' + fullStr.slice(fullStr.length - maxLen) : fullStr;
+  const inputStart = display.length - current.length;
+
+  elLines[0].innerHTML =
+    '<span style="color:#9ea3ba">' + display.slice(0, inputStart) + '</span>' +
+    '<span style="color:#6a7cff;font-weight:bold">' + display.slice(inputStart) + '</span>';  
+
+  elLines[1].textContent = '';
+  elLines[2].textContent = '';
 }
 
 // ─── Tastatur ─────────────────────────────────────────────────────────────────
@@ -169,27 +168,22 @@ function handleKey(label) {
     submitAnswer();
     return;
   }
-  // Siffer
   const digit = label;
   const target = seq[seqPos];
 
-  // For flersifrede tall: bygg opp buffer
   inputBuf += digit;
   elInput.value = inputBuf;
 
-  // Sjekk om bufferet matcher starten av target
   if (!target.startsWith(inputBuf)) {
     triggerWrong();
     return;
   }
 
-  // Hvis bufferet er komplett
   if (inputBuf === target) {
     submitAnswer();
     return;
   }
 
-  // Delvis riktig – fortsett
   resetTimer();
   renderSequence();
 }
@@ -197,11 +191,10 @@ function handleKey(label) {
 function submitAnswer() {
   const target = seq[seqPos];
   if (inputBuf !== target) {
-    if (inputBuf === '') return; // ingenting tastet
+    if (inputBuf === '') return;
     triggerWrong();
     return;
   }
-  // Riktig!
   seqPos++;
   score = seqPos + 1;
   elScore.textContent = score;
@@ -221,7 +214,7 @@ function triggerWrong() {
   gameOver = true;
   stopTimer();
   elKeypad.classList.add('disabled');
-  elStatus.textContent = `✗ Feil! Riktig var: ${seq[seqPos]}`;
+  elStatus.textContent = '✗ Feil! Riktig var: ' + seq[seqPos];
   elStatus.style.color = '#ff6b6b';
   elInput.value = inputBuf;
 }
@@ -236,9 +229,9 @@ function startTimer() {
     updateTimerDisplay();
     if (timeLeft <= 0) {
       stopTimer();
-      inputBuf = seq[seqPos]; // vis riktig svar
+      inputBuf = seq[seqPos];
       triggerWrong();
-      elStatus.textContent = `⏱ Tiden gikk ut! Riktig var: ${seq[seqPos - (gameOver ? 0 : 1)]}`;
+      elStatus.textContent = '⏱ Tiden gikk ut! Riktig var: ' + seq[seqPos - (gameOver ? 0 : 1)];
     }
   }, 100);
 }
@@ -269,7 +262,6 @@ function updateRulesPanel() {
 
 // ─── Event listeners ──────────────────────────────────────────────────────────
 
-// Modusfaner
 document.querySelectorAll('.mode-tab').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.mode-tab').forEach(b => {
@@ -284,10 +276,8 @@ document.querySelectorAll('.mode-tab').forEach(btn => {
   });
 });
 
-// Restart
 elRestart.addEventListener('click', startGame);
 
-// Tidtaker-toggle
 elTimerToggle.addEventListener('click', () => {
   timerOn = !timerOn;
   elTimerToggle.textContent = timerOn ? 'På' : 'Av';
@@ -296,7 +286,6 @@ elTimerToggle.addEventListener('click', () => {
   if (timerOn) startTimer(); else { stopTimer(); elTimer.textContent = '–'; }
 });
 
-// Regler-toggle
 elRulesToggle.addEventListener('click', () => {
   const hidden = elRulesPanel.hidden;
   elRulesPanel.hidden = !hidden;
